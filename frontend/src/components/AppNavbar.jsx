@@ -18,9 +18,30 @@ const AppNavbar = () => {
         <Navbar.Toggle />
         <Navbar.Collapse>
           <Nav className="me-auto">
-            <Nav.Link as={NavLink} to="/doctors">Doctors</Nav.Link>
-            {user && user.role === "patient" && (
-              <Nav.Link as={NavLink} to="/appointments">My Appointments</Nav.Link>
+            {user && user.role === "user" && (
+              <>
+                <Nav.Link as={NavLink} to="/doctors">Doctors</Nav.Link>
+                <Nav.Link as={NavLink} to="/appointments">My Appointments</Nav.Link>
+                <Nav.Link as={NavLink} to="/profile">Profile</Nav.Link>
+              </>
+            )}
+            {user && user.role === "doctor" && (
+              <>
+                <Nav.Link as={NavLink} to="/doctor/appointments">Appointments</Nav.Link>
+                <Nav.Link as={NavLink} to="/doctor/accepted">Accepted</Nav.Link>
+                <Nav.Link as={NavLink} to="/doctor/rejected">Rejected</Nav.Link>
+                <Nav.Link as={NavLink} to="/doctor/profile">My Profile</Nav.Link>
+              </>
+            )}
+            {user && user.role === "admin" && (
+              <>
+                <Nav.Link as={NavLink} to="/admin/users">Users</Nav.Link>
+                <Nav.Link as={NavLink} to="/admin/doctors">Doctors</Nav.Link>
+                <Nav.Link as={NavLink} to="/admin/profile">My Profile</Nav.Link>
+              </>
+            )}
+            {!user && (
+              <Nav.Link as={NavLink} to="/doctors">Doctors</Nav.Link>
             )}
           </Nav>
           <Nav>

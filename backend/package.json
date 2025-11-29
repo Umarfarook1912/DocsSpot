@@ -4,7 +4,8 @@
   "main": "src/server.js",
   "scripts": {
     "dev": "nodemon src/server.js",
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "create-missing-doctors": "node scripts/create_missing_doctors.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

@@ -4,14 +4,9 @@ import { uploadDoctorPhoto } from "../middleware/uploadDoctorPhoto.js";
 
 const router = express.Router();
 
-// Use upload middleware only for doctor registration
-router.post("/register", (req, res, next) => {
-	if (req.body && req.body.role === "doctor") {
-		uploadDoctorPhoto.single("photo")(req, res, next);
-	} else {
-		next();
-	}
-}, register);
+
+// Always run upload middleware so req.body is populated for all roles
+router.post("/register", uploadDoctorPhoto.single("photo"), register);
 
 router.post("/login", login);
 

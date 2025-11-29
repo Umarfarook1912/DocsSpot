@@ -1,10 +1,12 @@
 
+
 import { User } from "../models/User.js";
+import { Doctor } from "../models/Doctor.js";
 import { generateToken } from "../utils/generateToken.js";
 
 export const register = async (req, res) => {
   try {
-    const { name, email, password, role = "user", phone, designation, about } = req.body;
+    const { name, email, password, role = "user", phone, designation, about, specialization, experience, fee } = req.body;
     const exists = await User.findOne({ email });
     if (exists) return res.status(400).json({ message: "User exists" });
 
@@ -18,6 +20,18 @@ export const register = async (req, res) => {
     }
 
     const user = await User.create(userData);
+
+    // If doctor, create Doctor profile as well
+    if (role === "doctor") {
+      // specialization, experience, fee are required for Doctor
+      await Doctor.create({
+        user: user._id,
+        specialization: specialization || "General",
+        experience: experience || 0,
+        fee: fee || 0
+      });
+    }
+
     const token = generateToken(user._id, user.role);
 
     res.status(201).json({
@@ -36,7 +50,7 @@ export const register = async (req, res) => {
       }
     });
   } catch (e) {
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: e.message || "Server error" });
   }
 };
 
