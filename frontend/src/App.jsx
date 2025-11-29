@@ -6,7 +6,9 @@ import RegisterPage from "./pages/RegisterPage.jsx";
 import DoctorsPage from "./pages/DoctorsPage.jsx";
 import BookAppointmentPage from "./pages/BookAppointmentPage.jsx";
 import MyAppointmentsPage from "./pages/MyAppointmentsPage.jsx";
+
 import PrivateRoute from "./router/PrivateRoute.jsx";
+import AdminDashboard from "./pages/AdminDashboard.jsx";
 
 const App = () => {
   return (
@@ -23,6 +25,9 @@ const App = () => {
         <Route element={<PrivateRoute roles={["patient"]} />}>
           <Route path="/book/:doctorId" element={<BookAppointmentPage />} />
           <Route path="/appointments" element={<MyAppointmentsPage />} />
+        </Route>
+        <Route element={<PrivateRoute roles={["admin"]} />}>
+          <Route path="/admin" element={<AdminDashboard />} />
         </Route>
       </Routes>
     </>

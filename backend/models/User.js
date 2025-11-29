@@ -6,11 +6,16 @@ const userSchema = new mongoose.Schema(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    phone: { type: String, required: true },
     role: {
       type: String,
-      enum: ["patient", "doctor", "admin"],
-      default: "patient"
-    }
+      enum: ["admin", "user", "doctor"],
+      default: "user"
+    },
+    // Doctor-specific fields (optional for user, required for doctor)
+    designation: { type: String },
+    about: { type: String },
+    photo: { type: String },
   },
   { timestamps: true }
 );

@@ -1,22 +1,38 @@
+
+
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import AuthForm from "../components/Forms/AuthForm.jsx";
 import { registerApi } from "../api/authApi.js";
 import { useAuth } from "../contexts/AuthContext.jsx";
-import { Alert, Form } from "react-bootstrap";
+import { Alert, Card, Form, Button } from "react-bootstrap";
+import RoleSelect from "../components/Forms/RoleSelect.jsx";
+import UserFields from "../components/Forms/UserFields.jsx";
+import DoctorFields from "../components/Forms/DoctorFields.jsx";
 
 const RegisterPage = () => {
   const { login } = useAuth();
-  const [role, setRole] = useState("patient");
+  const [role, setRole] = useState("user");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = async (values) => {
+  const handleRoleChange = (e) => setRole(e.target.value);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setLoading(true);
     setError("");
+    const formData = new FormData(e.target);
     try {
-      const res = await registerApi({ ...values, role });
+      let data;
+      if (role === "doctor") {
+        // For doctor, send as multipart/form-data
+        data = formData;
+      } else {
+        // For user, send as JSON
+        data = Object.fromEntries(formData.entries());
+      }
+      const res = await registerApi(data, role);
       login(res.data);
       navigate("/");
     } catch (err) {
@@ -33,27 +49,18 @@ const RegisterPage = () => {
           {error}
         </Alert>
       )}
-      <AuthForm
-        title="Register"
-        loading={loading}
-        onSubmit={handleSubmit}
-        fields={[
-          { name: "name", label: "Name" },
-          { name: "email", label: "Email", type: "email" },
-          { name: "password", label: "Password", type: "password" }
-        ]}
-      />
-      <Form.Group
-        className="mx-auto mt-3"
-        style={{ maxWidth: 420 }}
-        controlId="role"
-      >
-        <Form.Label>Role</Form.Label>
-        <Form.Select value={role} onChange={(e) => setRole(e.target.value)}>
-          <option value="patient">Patient</option>
-          <option value="doctor">Doctor</option>
-        </Form.Select>
-      </Form.Group>
+      <Card className="mx-auto" style={{ maxWidth: 420 }}>
+        <Card.Body>
+          <Card.Title className="mb-3">Register</Card.Title>
+          <Form onSubmit={handleSubmit} encType={role === "doctor" ? "multipart/form-data" : undefined}>
+            <RoleSelect value={role} onChange={handleRoleChange} />
+            {role === "user" ? <UserFields /> : <DoctorFields />}
+            <Button type="submit" disabled={loading} className="w-100 mt-2">
+              {loading ? "Please wait..." : "Submit"}
+            </Button>
+          </Form>
+        </Card.Body>
+      </Card>
       <p className="text-center mt-3">
         Already registered? <Link to="/login">Login</Link>
       </p>
