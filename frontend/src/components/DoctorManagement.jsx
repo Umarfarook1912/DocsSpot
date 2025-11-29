@@ -10,7 +10,7 @@ const DoctorManagement = () => {
 
     const loadDoctors = async () => {
         setLoading(true);
-            try {
+        try {
             const res = await fetchDoctorsAdminApi();
             // axios returns data in res.data
             const docs = res?.data ?? res;
@@ -57,7 +57,7 @@ const DoctorManagement = () => {
     return (
         <div>
             <h4>Doctor Management</h4>
-            
+
             <Table bordered hover>
                 <thead>
                     <tr>
