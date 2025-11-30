@@ -67,7 +67,7 @@ const DoctorProfilePage = () => {
                     const r2 = await updateProfileApi(formData);
                     const u2 = r2?.data?.user || r2?.data || r2;
                     // update auth context user
-                    try { updateUser && updateUser(u2); } catch (e) {}
+                    try { updateUser && updateUser(u2); } catch (e) { }
                 } catch (e) { /* ignore */ }
             }
             const staticBase = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/api\/?$/, "");

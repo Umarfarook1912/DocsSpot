@@ -24,7 +24,7 @@ const AdminProfilePage = () => {
                 const staticBase = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/api\/?$/, "");
                 if (u.photo) setPhotoPreview(`${staticBase}/${u.photo.replace(/\\/g, "/")}`);
             })
-            .catch(() => {});
+            .catch(() => { });
         return () => (mounted = false);
     }, []);
 
