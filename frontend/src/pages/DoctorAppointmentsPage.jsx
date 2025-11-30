@@ -16,7 +16,8 @@ const DoctorAppointmentsPage = () => {
     const loadAppointments = async () => {
         setLoading(true);
         try {
-            const data = await fetchMyAppointmentsApi();
+            const res = await fetchMyAppointmentsApi();
+            const data = res?.data ?? res;
             setAppointments(data);
         } catch (err) {
             setError(err.response?.data?.message || "Failed to load appointments");

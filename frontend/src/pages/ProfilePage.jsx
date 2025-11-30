@@ -1,16 +1,107 @@
 import { useAuth } from "../contexts/AuthContext.jsx";
-import { Container, Card } from "react-bootstrap";
+import { Container, Card, Form, Button, Alert, Image, Row, Col } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { getProfileApi, updateProfileApi, deleteProfileApi } from "../api/authApi.js";
+import { useNavigate } from "react-router-dom";
 
 const ProfilePage = () => {
-    const { user } = useAuth();
+    const { user, updateUser, logout } = useAuth();
+    const [form, setForm] = useState({ name: "", phone: "" });
+    const [photoPreview, setPhotoPreview] = useState("");
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
+    const [saving, setSaving] = useState(false);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        let mounted = true;
+        getProfileApi()
+            .then((res) => {
+                const data = res?.data ?? res;
+                if (!mounted) return;
+                // If doctor payload includes doctor info, use user from data.user
+                const u = data.user || data;
+                setForm({ name: u.name || "", phone: u.phone || "" });
+                const staticBase = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/api\/?$/, "");
+                if (u.photo) setPhotoPreview(`${staticBase}/${u.photo.replace(/\\/g, "/")}`);
+            })
+            .catch(() => {});
+        return () => (mounted = false);
+    }, []);
+
+    const handleChange = (e) => {
+        const { name, value, files } = e.target;
+        if (name === "photo" && files[0]) {
+            setForm((f) => ({ ...f, photo: files[0] }));
+            setPhotoPreview(URL.createObjectURL(files[0]));
+        } else setForm((f) => ({ ...f, [name]: value }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setSaving(true);
+        setError("");
+        setSuccess("");
+        const fd = new FormData();
+        Object.entries(form).forEach(([k, v]) => {
+            if (v !== undefined && v !== null) fd.append(k, v);
+        });
+        try {
+            const res = await updateProfileApi(fd);
+            const data = res?.data ?? res;
+            const u = data.user || data;
+            updateUser(u);
+            setSuccess("Profile updated.");
+        } catch (err) {
+            setError(err.response?.data?.message || err.message || "Update failed");
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!confirm("Delete your account? This cannot be undone.")) return;
+        try {
+            await deleteProfileApi();
+            logout();
+            navigate("/");
+        } catch (err) {
+            setError(err.response?.data?.message || err.message || "Delete failed");
+        }
+    };
+
     return (
         <Container>
-            <Card className="mx-auto mt-4" style={{ maxWidth: 420 }}>
+            <Card className="mx-auto mt-4" style={{ maxWidth: 720 }}>
                 <Card.Body>
                     <Card.Title>My Profile</Card.Title>
-                    <div><b>Name:</b> {user?.name}</div>
-                    <div><b>Email:</b> {user?.email}</div>
-                    <div><b>Phone:</b> {user?.phone}</div>
+                    {error && <Alert variant="danger">{error}</Alert>}
+                    {success && <Alert variant="success">{success}</Alert>}
+                    <Form onSubmit={handleSubmit} encType="multipart/form-data">
+                        <Row>
+                            <Col xs={4} className="d-flex align-items-center justify-content-center">
+                                <Image src={photoPreview || "https://via.placeholder.com/120x120?text=User"} roundedCircle width={120} height={120} alt={form.name} />
+                            </Col>
+                            <Col>
+                                <Form.Group className="mb-2">
+                                    <Form.Label>Name</Form.Label>
+                                    <Form.Control name="name" value={form.name} onChange={handleChange} required />
+                                </Form.Group>
+                                <Form.Group className="mb-2">
+                                    <Form.Label>Phone</Form.Label>
+                                    <Form.Control name="phone" value={form.phone} onChange={handleChange} />
+                                </Form.Group>
+                                <Form.Group className="mb-2">
+                                    <Form.Label>Photo</Form.Label>
+                                    <Form.Control name="photo" type="file" accept="image/*" onChange={handleChange} />
+                                </Form.Group>
+                                <Button type="submit" disabled={saving} className="me-2">
+                                    {saving ? "Saving..." : "Update Profile"}
+                                </Button>
+                                <Button variant="danger" onClick={handleDelete}>Delete Account</Button>
+                            </Col>
+                        </Row>
+                    </Form>
                 </Card.Body>
             </Card>
         </Container>

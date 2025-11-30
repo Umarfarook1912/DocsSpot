@@ -28,8 +28,6 @@ const AppNavbar = () => {
             {user && user.role === "doctor" && (
               <>
                 <Nav.Link as={NavLink} to="/doctor/appointments">Appointments</Nav.Link>
-                <Nav.Link as={NavLink} to="/doctor/accepted">Accepted</Nav.Link>
-                <Nav.Link as={NavLink} to="/doctor/rejected">Rejected</Nav.Link>
                 <Nav.Link as={NavLink} to="/doctor/profile">My Profile</Nav.Link>
               </>
             )}

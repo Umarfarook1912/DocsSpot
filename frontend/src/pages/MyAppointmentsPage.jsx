@@ -26,7 +26,9 @@ const MyAppointmentsPage = () => {
         {data?.map((a) => {
           const doc = a.doctor;
           const user = doc?.user || {};
-          const photoUrl = user.photo ? `/${user.photo.replace(/\\/g, "/")}` : "https://via.placeholder.com/60x60?text=Doctor";
+          const staticBase = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/api\/?$/, "");
+          const photoPath = user.photo ? user.photo.replace(/\\/g, "/") : "";
+          const photoUrl = photoPath ? `${staticBase}/${photoPath}` : "https://via.placeholder.com/60x60?text=Doctor";
           return (
             <ListGroup.Item key={a._id}>
               <Row>

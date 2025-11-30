@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { Container, Card, Form, Button, Alert, Row, Col, Image, Spinner } from "react-bootstrap";
 import { getMyDoctorProfileApi, updateMyDoctorProfileApi } from "../api/doctorApi.js";
+import { updateProfileApi, deleteProfileApi } from "../api/authApi.js";
+import { useAuth } from "../contexts/AuthContext.jsx";
+import { useNavigate } from "react-router-dom";
 
 const DoctorProfilePage = () => {
     const [profile, setProfile] = useState(null);
@@ -11,22 +14,27 @@ const DoctorProfilePage = () => {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
+    const { logout } = useAuth();
+    const { updateUser } = useAuth();
+
     useEffect(() => {
         getMyDoctorProfileApi()
-            .then((data) => {
+            .then((res) => {
+                const data = res?.data ?? res;
                 setProfile(data);
                 setForm({
-                    name: data.user.name,
-                    phone: data.user.phone,
-                    designation: data.user.designation,
-                    about: data.user.about,
-                    specialization: data.specialization,
-                    experience: data.experience,
-                    fee: data.fee,
+                    name: data.user?.name || "",
+                    phone: data.user?.phone || "",
+                    designation: data.user?.designation || "",
+                    about: data.user?.about || "",
+                    specialization: data.specialization || "",
+                    experience: data.experience || 0,
+                    fee: data.fee || 0,
                 });
-                setPhotoPreview(data.user.photo ? `/${data.user.photo.replace(/\\/g, "/")}` : "");
+                const staticBase = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/api\/?$/, "");
+                setPhotoPreview(data.user?.photo ? `${staticBase}/${data.user.photo.replace(/\\/g, "/")}` : "");
             })
-            .catch((err) => setError(err.response?.data?.message || "Failed to load profile"))
+            .catch((err) => setError(err.response?.data?.message || err.message || "Failed to load profile"))
             .finally(() => setLoading(false));
     }, []);
 
@@ -50,13 +58,38 @@ const DoctorProfilePage = () => {
             if (v !== undefined && v !== null) formData.append(k, v);
         });
         try {
-            const data = await updateMyDoctorProfileApi(formData);
+            const res = await updateMyDoctorProfileApi(formData);
+            const data = res?.data ?? res;
             setProfile(data);
+            // Also update auth stored user if name/photo changed
+            if (data.user) {
+                try {
+                    const r2 = await updateProfileApi(formData);
+                    const u2 = r2?.data?.user || r2?.data || r2;
+                    // update auth context user
+                    try { updateUser && updateUser(u2); } catch (e) {}
+                } catch (e) { /* ignore */ }
+            }
+            const staticBase = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/api\/?$/, "");
+            if (data.user?.photo) setPhotoPreview(`${staticBase}/${data.user.photo.replace(/\\/g, "/")}`);
             setSuccess("Profile updated successfully.");
         } catch (err) {
             setError(err.response?.data?.message || "Update failed");
         } finally {
             setSaving(false);
+        }
+    };
+
+    const navigate = useNavigate();
+
+    const handleDelete = async () => {
+        if (!confirm("Delete your account? This will remove your doctor profile and related appointments.")) return;
+        try {
+            await deleteProfileApi();
+            logout();
+            navigate("/");
+        } catch (err) {
+            setError(err.response?.data?.message || "Delete failed");
         }
     };
 

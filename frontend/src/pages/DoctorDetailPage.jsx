@@ -12,10 +12,11 @@ const DoctorDetailPage = () => {
     useEffect(() => {
         const fetchDoctor = async () => {
             try {
-                const data = await fetchDoctorByIdApi(id);
+                const res = await fetchDoctorByIdApi(id);
+                const data = res?.data ?? res;
                 setDoctor(data);
             } catch (err) {
-                setError(err.response?.data?.message || "Failed to load doctor");
+                setError(err.response?.data?.message || err.message || "Failed to load doctor");
             } finally {
                 setLoading(false);
             }
@@ -37,7 +38,9 @@ const DoctorDetailPage = () => {
         );
     if (!doctor) return null;
     const { user } = doctor;
-    const photoUrl = user.photo ? `/${user.photo.replace(/\\/g, "/")}` : "https://via.placeholder.com/120x120?text=Doctor";
+    const staticBase = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/api\/?$/, "");
+    const photoPath = user.photo ? user.photo.replace(/\\/g, "/") : "";
+    const photoUrl = photoPath ? `${staticBase}/${photoPath}` : "https://via.placeholder.com/120x120?text=Doctor";
     return (
         <Container className="mt-4">
             <Card className="mx-auto" style={{ maxWidth: 600 }}>
