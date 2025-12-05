@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/authRoutes.js";
 import doctorRoutes from "./routes/doctorRoutes.js";
 import appointmentRoutes from "./routes/appointmentRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 import path from "path";
 
 dotenv.config();
@@ -23,5 +24,6 @@ app.get("/", (_req, res) => res.json({ message: "API running" }));
 app.use("/api/auth", authRoutes);
 app.use("/api/doctors", doctorRoutes);
 app.use("/api/appointments", appointmentRoutes);
+app.use("/api/admin", adminRoutes);
 
 export default app;

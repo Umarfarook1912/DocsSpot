@@ -11,13 +11,20 @@ const DoctorsPage = () => {
   const [minFee, setMinFee] = useState("");
   const [maxFee, setMaxFee] = useState("");
 
-  const filtered = useMemo(() => {
+  // Only treat doctors as valid when they have a populated user (name + email).
+  // This avoids showing placeholder/default specialization entries with no real user.
+  const validData = useMemo(() => {
     if (!data) return [];
+    return data.filter((d) => d && d.user && d.user.name && d.user.email);
+  }, [data]);
+
+  const filtered = useMemo(() => {
+    if (!validData) return [];
     const q = query.trim().toLowerCase();
     const min = parseInt(minFee, 10);
     const max = parseInt(maxFee, 10);
 
-    return data.filter((d) => {
+    return validData.filter((d) => {
       const name = (d.user?.name || "").toLowerCase();
       const spec = (d.specialization || "").toLowerCase();
       const fee = Number(d.fee || 0);
@@ -67,7 +74,7 @@ const DoctorsPage = () => {
         </div>
       </div>
 
-      {filtered?.length === 0 && <p className="text-muted">No doctors match your search.</p>}
+      {filtered?.length === 0 && <p className="text-muted">No doctors found.</p>}
       <Row className="g-4">
         {filtered?.map((d) => (
           <Col key={d._id} xs={12} md={6} lg={4}>

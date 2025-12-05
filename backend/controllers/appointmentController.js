@@ -1,29 +1,6 @@
-
-export const updateAppointmentStatus = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { status } = req.body;
-    if (!['confirmed', 'cancelled'].includes(status)) {
-      return res.status(400).json({ message: 'Invalid status' });
-    }
-    const appointment = await Appointment.findById(id);
-    if (!appointment) return res.status(404).json({ message: 'Appointment not found' });
-    // Only doctor can update their own appointments
-    // appointment.doctor is a Doctor id; find the Doctor document to verify ownership
-    const doctorDoc = await Doctor.findById(appointment.doctor);
-    if (!doctorDoc) return res.status(404).json({ message: 'Doctor not found' });
-    if (String(doctorDoc.user) !== String(req.user._id)) {
-      return res.status(403).json({ message: 'Not authorized' });
-    }
-    appointment.status = status;
-    await appointment.save();
-    res.json(appointment);
-  } catch {
-    res.status(500).json({ message: 'Server error' });
-  }
-};
 import { Appointment } from "../models/Appointment.js";
 import { Doctor } from "../models/Doctor.js";
+import { notifyDoctorOnNewAppointment, notifyUserOnAppointmentConfirmed } from "../utils/mailer.js";
 
 export const createAppointment = async (req, res) => {
   const { doctorId, date, time } = req.body;
@@ -34,6 +11,17 @@ export const createAppointment = async (req, res) => {
       date,
       time
     });
+    // notify doctor
+    try {
+      const doctorDoc = await Doctor.findById(doctorId).populate('user');
+      const patientUser = req.user;
+      if (doctorDoc && doctorDoc.user) {
+        await notifyDoctorOnNewAppointment(doctorDoc.user, appointment, patientUser);
+      }
+    } catch (e) {
+      console.error('Failed to notify doctor about new appointment', e);
+    }
+
     res.status(201).json(appointment);
   } catch {
     res.status(500).json({ message: "Server error" });
@@ -62,5 +50,41 @@ export const getMyAppointments = async (req, res) => {
     res.json(appointments);
   } catch {
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const updateAppointmentStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    if (!['confirmed', 'cancelled'].includes(status)) {
+      return res.status(400).json({ message: 'Invalid status' });
+    }
+    const appointment = await Appointment.findById(id);
+    if (!appointment) return res.status(404).json({ message: 'Appointment not found' });
+    // Only doctor can update their own appointments
+    // appointment.doctor is a Doctor id; find the Doctor document to verify ownership
+    const doctorDoc = await Doctor.findById(appointment.doctor);
+    if (!doctorDoc) return res.status(404).json({ message: 'Doctor not found' });
+    if (String(doctorDoc.user) !== String(req.user._id)) {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+    appointment.status = status;
+    await appointment.save();
+    try {
+      if (status === 'confirmed') {
+        // notify patient
+        const patient = await appointment.populate('patient');
+        const doctor = await Doctor.findById(appointment.doctor).populate('user');
+        if (patient.patient && doctor && doctor.user) {
+          await notifyUserOnAppointmentConfirmed(patient.patient, appointment, doctor.user);
+        }
+      }
+    } catch (e) {
+      console.error('Failed to notify user about appointment confirmation', e);
+    }
+    res.json(appointment);
+  } catch {
+    res.status(500).json({ message: 'Server error' });
   }
 };

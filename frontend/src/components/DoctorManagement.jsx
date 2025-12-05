@@ -55,9 +55,15 @@ const DoctorManagement = () => {
     if (loading) return <Spinner animation="border" />;
     if (error) return <Alert variant="danger">{error}</Alert>;
 
+    const validDoctors = Array.isArray(doctors) ? doctors.filter((doc) => doc && doc.user && (doc.user.email || doc.user.name)) : [];
+
     return (
         <div>
             <h4>Doctor Management</h4>
+
+            {Array.isArray(doctors) && doctors.length > 0 && validDoctors.length !== doctors.length && (
+                <Alert variant="warning">Some doctor entries are missing user details and were hidden from the table ({doctors.length - validDoctors.length} entry(s)). Please check the database for incomplete records.</Alert>
+            )}
 
             <Table bordered hover>
                 <thead>
@@ -70,8 +76,8 @@ const DoctorManagement = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {Array.isArray(doctors) && doctors.length > 0 ? (
-                        doctors.map((doc) => (
+                    {validDoctors.length > 0 ? (
+                        validDoctors.map((doc) => (
                             <tr key={doc._id}>
                                 <td>{doc.user?.name}</td>
                                 <td>{doc.user?.email}</td>

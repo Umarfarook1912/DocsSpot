@@ -4,6 +4,7 @@ import { User } from "../models/User.js";
 import { Doctor } from "../models/Doctor.js";
 import { Appointment } from "../models/Appointment.js";
 import { generateToken } from "../utils/generateToken.js";
+import { notifyAdminOnDoctorRegistration } from "../utils/mailer.js";
 
 export const register = async (req, res) => {
   try {
@@ -31,6 +32,14 @@ export const register = async (req, res) => {
         experience: experience || 0,
         fee: fee || 0
       });
+      try {
+        // send email to admin with doctor details
+        // reload user and doctor profile for details
+        const doctorProfile = await Doctor.findOne({ user: user._id });
+        await notifyAdminOnDoctorRegistration(user, doctorProfile);
+      } catch (e) {
+        console.error('Failed to notify admin about doctor registration', e);
+      }
     }
 
     const token = generateToken(user._id, user.role);

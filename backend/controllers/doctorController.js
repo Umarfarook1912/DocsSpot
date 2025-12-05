@@ -42,6 +42,7 @@ export const getDoctorById = async (req, res) => {
   }
 };
 import { Doctor } from "../models/Doctor.js";
+import { notifyDoctorOnApproval } from "../utils/mailer.js";
 
 export const createDoctorProfile = async (req, res) => {
   try {
@@ -71,6 +72,16 @@ export const approveDoctor = async (req, res) => {
       { isApproved: true },
       { new: true }
     );
+    // notify the doctor via email
+    try {
+      const populated = await Doctor.findById(doctor._id).populate('user');
+      const doctorUser = populated?.user;
+      if (doctorUser && doctorUser.email) {
+        await notifyDoctorOnApproval(doctorUser);
+      }
+    } catch (e) {
+      console.error('Failed to send doctor approval email', e);
+    }
     res.json(doctor);
   } catch {
     res.status(500).json({ message: "Server error" });

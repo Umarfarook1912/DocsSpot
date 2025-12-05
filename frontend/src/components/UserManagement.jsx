@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Modal, Form, Alert } from "react-bootstrap";
+import { Table, Button, Modal, Form, Alert, Spinner } from "react-bootstrap";
 import { FiPlus, FiEdit, FiTrash2 } from "react-icons/fi";
+import client from "../api/client";
 
 const roles = ["admin", "user", "doctor"];
 
@@ -10,15 +11,22 @@ const UserManagement = () => {
     const [form, setForm] = useState({ name: "", email: "", password: "", role: "user" });
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    // Placeholder: Fetch users from backend
     useEffect(() => {
-        // TODO: Replace with real API call
-        setUsers([
-            { _id: 1, name: "Alice", email: "alice@example.com", role: "admin" },
-            { _id: 2, name: "Bob", email: "bob@example.com", role: "user" },
-            { _id: 3, name: "Dr. Smith", email: "drsmith@example.com", role: "doctor" },
-        ]);
+        const fetchUsers = async () => {
+            setLoading(true);
+            try {
+                const { data } = await client.get('/admin/users');
+                setUsers(data);
+            } catch (e) {
+                console.error('Failed to fetch users', e);
+                setError(e?.response?.data?.message || 'Failed to load users');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchUsers();
     }, []);
 
     const handleShow = () => {
@@ -36,14 +44,34 @@ const UserManagement = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // TODO: Replace with real API call
         if (!form.name || !form.email || !form.password) {
             setError("All fields are required.");
             return;
         }
-        setUsers([...users, { ...form, _id: Date.now() }]);
-        setSuccess("User created successfully.");
-        setShowModal(false);
+        setError("");
+        (async () => {
+            try {
+                const { data } = await client.post('/admin/users', form);
+                setUsers((prev) => [data.user, ...prev]);
+                setSuccess('User created successfully.');
+                setShowModal(false);
+            } catch (e) {
+                console.error('Create user failed', e);
+                setError(e?.response?.data?.message || 'Failed to create user');
+            }
+        })();
+    };
+
+    const handleDelete = async (id) => {
+        if (!window.confirm('Delete this user?')) return;
+        try {
+            await client.delete(`/admin/users/${id}`);
+            setUsers((prev) => prev.filter((u) => String(u._id || u.id) !== String(id)));
+            setSuccess('User deleted');
+        } catch (e) {
+            console.error('Delete user failed', e);
+            setError(e?.response?.data?.message || 'Failed to delete user');
+        }
     };
 
     return (
@@ -53,6 +81,7 @@ const UserManagement = () => {
                 <Button onClick={handleShow}><FiPlus className="me-1" /> Create New User</Button>
             </div>
             {success && <Alert variant="success">{success}</Alert>}
+            {error && <Alert variant="danger">{error}</Alert>}
             <Table bordered hover>
                 <thead>
                     <tr>
@@ -63,7 +92,11 @@ const UserManagement = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {users.map((user) => (
+                    {loading ? (
+                        <tr><td colSpan={4} className="text-center py-4"><Spinner animation="border" size="sm" /> Loading...</td></tr>
+                    ) : users.length === 0 ? (
+                        <tr><td colSpan={4} className="text-center py-4">No users found</td></tr>
+                    ) : users.map((user) => (
                         <tr key={user._id}>
                             <td>{user.name}</td>
                             <td>{user.email}</td>
@@ -72,7 +105,7 @@ const UserManagement = () => {
                                 <Button size="sm" variant="outline-primary" className="me-2">
                                     <FiEdit />
                                 </Button>
-                                <Button size="sm" variant="outline-danger">
+                                <Button size="sm" variant="outline-danger" onClick={() => handleDelete(user._id || user.id)}>
                                     <FiTrash2 />
                                 </Button>
                             </td>
