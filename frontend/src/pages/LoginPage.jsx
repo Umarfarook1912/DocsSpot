@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import AuthForm from "../components/Forms/AuthForm.jsx";
 import { loginApi } from "../api/authApi.js";
 import { useAuth } from "../contexts/AuthContext.jsx";
-import { Alert, Container } from "react-bootstrap";
+import { Alert, Container, Row, Col, Button } from "react-bootstrap";
 import { FiLogIn } from "react-icons/fi";
 
 const LoginPage = () => {
@@ -27,25 +27,33 @@ const LoginPage = () => {
   };
 
   return (
-    <Container className="mt-3 text-center">
-      <h3 className="page-title"><FiLogIn /> Login</h3>
-      {error && (
-        <Alert variant="danger" className="mx-auto" style={{ maxWidth: 420 }}>
-          {error}
-        </Alert>
-      )}
-      <AuthForm
-        title="Login"
-        loading={loading}
-        onSubmit={handleSubmit}
-        fields={[
-          { name: "email", label: "Email", type: "email" },
-          { name: "password", label: "Password", type: "password" }
-        ]}
-      />
-      <p className="text-center mt-3">
-        No account? <Link to="/register">Register</Link>
-      </p>
+    <Container className="mt-4">
+      <Row className="justify-content-center align-items-center" style={{ minHeight: '65vh' }}>
+        <Col xs={12} md={6} className="text-center mb-3">
+          <h3 className="page-title"><FiLogIn /> Welcome back</h3>
+          <p className="muted-small">Login to manage your appointments and consult with trusted doctors.</p>
+        </Col>
+        <Col xs={12} md={6}>
+          {error && (
+            <Alert variant="danger" className="mx-auto" style={{ maxWidth: 420 }}>
+              {error}
+            </Alert>
+          )}
+          <AuthForm
+            title="Login"
+            loading={loading}
+            submitLabel="Login"
+            onSubmit={handleSubmit}
+            fields={[
+              { name: "email", label: "Email", type: "email" },
+              { name: "password", label: "Password", type: "password" }
+            ]}
+          />
+          <div className="text-center mt-2 muted-small">
+            <Link to="/forgot-password">Forgot password?</Link>
+          </div>
+        </Col>
+      </Row>
     </Container>
   );
 };

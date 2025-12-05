@@ -42,6 +42,35 @@ body {
   align-items: center;
 }
 
+/* Button polish */
+.btn {
+  border-radius: 10px;
+  padding: 0.6rem 1rem;
+  transition: transform 0.08s ease, box-shadow 0.12s ease;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn:hover {
+  box-shadow: 0 6px 18px rgba(47, 174, 102, 0.12);
+}
+
+.btn-primary {
+  background-color: var(--bs-primary) !important;
+  border-color: var(--bs-primary) !important;
+}
+
+.btn-outline-primary {
+  border-color: rgba(var(--bs-primary-rgb), 0.25);
+  color: var(--bs-primary);
+}
+
+.btn-icon svg {
+  margin-right: 0.5rem;
+}
+
 .form-control:focus {
   box-shadow: 0 0 0 0.15rem rgba(var(--bs-primary-rgb), 0.15);
   border-color: var(--bs-primary);
@@ -69,4 +98,30 @@ body {
 .center-card {
   margin-left: auto;
   margin-right: auto;
+}
+
+footer a {
+  color: inherit;
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+.testimonial {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+/* Register page adjustments */
+.register-hero {
+  padding: 2rem;
+}
+
+@media (min-width: 768px) {
+  .center-card {
+    max-width: 560px;
+  }
 }

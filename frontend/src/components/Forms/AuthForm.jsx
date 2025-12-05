@@ -7,7 +7,7 @@ const fieldIcon = (name, type) => {
   return <FiUser className="text-muted" />;
 };
 
-const AuthForm = ({ title, fields, onSubmit, loading }) => {
+const AuthForm = ({ title, fields, onSubmit, loading, submitLabel }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = Object.fromEntries(new FormData(e.target).entries());
@@ -32,9 +32,11 @@ const AuthForm = ({ title, fields, onSubmit, loading }) => {
               </InputGroup>
             </Form.Group>
           ))}
-          <Button type="submit" disabled={loading} className="w-100 btn-icon">
-            {loading ? "Please wait..." : "Submit"}
-          </Button>
+          <div style={{ textAlign: 'center' }}>
+            <Button type="submit" disabled={loading} className="btn-icon mx-auto d-block" variant="primary" size="md" style={{ minWidth: 180 }}>
+              {loading ? "Please wait..." : (submitLabel || "Submit")}
+            </Button>
+          </div>
         </Form>
       </Card.Body>
     </Card>
