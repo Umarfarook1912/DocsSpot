@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Container, Card, Spinner, Alert, Row, Col, Image, Button } from "react-bootstrap";
+import { Container, Card, Spinner, Alert, Row, Col, Image, Button, ListGroup } from "react-bootstrap";
+import { FiPhone, FiMail, FiClock, FiBriefcase, FiStar } from "react-icons/fi";
 import { fetchDoctorByIdApi } from "../api/doctorApi.js";
 
 const DoctorDetailPage = () => {
@@ -43,21 +44,32 @@ const DoctorDetailPage = () => {
     const photoUrl = photoPath ? `${staticBase}/${photoPath}` : "https://via.placeholder.com/120x120?text=Doctor";
     return (
         <Container className="mt-4">
-            <Card className="mx-auto" style={{ maxWidth: 600 }}>
+            <Card className="mx-auto card-enhanced" style={{ maxWidth: 900 }}>
                 <Card.Body>
                     <Row>
-                        <Col xs={4} className="d-flex align-items-center justify-content-center">
-                            <Image src={photoUrl} roundedCircle width={120} height={120} alt={user.name} />
+                        <Col md={4} className="d-flex flex-column align-items-center justify-content-center">
+                            <Image src={photoUrl} roundedCircle width={140} height={140} alt={user.name} />
+                            <div className="mt-3 text-center">
+                                <h5 className="mb-0">{user.name}</h5>
+                                <small className="text-muted">{user.designation || doctor.specialization}</small>
+                            </div>
                         </Col>
-                        <Col>
-                            <Card.Title>{user.name}</Card.Title>
-                            <Card.Subtitle className="mb-2 text-muted">{user.designation || doctor.specialization}</Card.Subtitle>
-                            <div><b>Email:</b> {user.email}</div>
-                            <div><b>Phone:</b> {user.phone}</div>
-                            <div><b>About:</b> {user.about}</div>
-                            <div><b>Fee:</b> ₹{doctor.fee}</div>
-                            <div><b>Experience:</b> {doctor.experience} years</div>
-                            <Button className="mt-3" href={`/book/${doctor._id}`}>Book Appointment</Button>
+                        <Col md={8}>
+                            <ListGroup variant="flush">
+                                <ListGroup.Item><FiMail className="me-2" /> {user.email}</ListGroup.Item>
+                                <ListGroup.Item><FiPhone className="me-2" /> {user.phone || 'Not provided'}</ListGroup.Item>
+                                <ListGroup.Item><FiBriefcase className="me-2" /> Experience: {doctor.experience || 0} years</ListGroup.Item>
+                                <ListGroup.Item><FiClock className="me-2" /> Fee: ₹{doctor.fee}</ListGroup.Item>
+                            </ListGroup>
+                            <div className="mt-3">
+                                <h6>About</h6>
+                                <p className="mb-2">{user.about || 'No description provided.'}</p>
+                                <h6>Reviews</h6>
+                                <div className="d-flex gap-2 align-items-center mb-2">
+                                    <FiStar className="text-warning" /> <small className="text-muted">No reviews yet</small>
+                                </div>
+                                <Button href={`/book/${doctor._id}`} variant="primary">Book Appointment</Button>
+                            </div>
                         </Col>
                     </Row>
                 </Card.Body>

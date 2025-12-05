@@ -1,12 +1,14 @@
 import React from "react";
+import { Container } from "react-bootstrap";
 import UserManagement from "../components/UserManagement.jsx";
+import { FiUsers } from "react-icons/fi";
 
 const AdminUsersPage = () => {
     return (
-        <div style={{ maxWidth: 900, margin: "0 auto", padding: 24 }}>
-            <h2>Admin - Users</h2>
+        <Container className="mt-3">
+            <h2 className="page-title"><FiUsers /> Admin - Users</h2>
             <UserManagement />
-        </div>
+        </Container>
     );
 };
 

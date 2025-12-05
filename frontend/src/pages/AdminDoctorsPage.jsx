@@ -1,12 +1,14 @@
 import React from "react";
+import { Container } from "react-bootstrap";
 import DoctorManagement from "../components/DoctorManagement.jsx";
+import { FiUsers } from "react-icons/fi";
 
 const AdminDoctorsPage = () => {
     return (
-        <div style={{ maxWidth: 1100, margin: "0 auto", padding: 24 }}>
-            <h2>Admin - Doctors</h2>
+        <Container className="mt-3">
+            <h2 className="page-title"><FiUsers /> Admin - Doctors</h2>
             <DoctorManagement />
-        </div>
+        </Container>
     );
 };
 

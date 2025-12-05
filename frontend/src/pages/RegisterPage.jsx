@@ -4,10 +4,11 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { registerApi } from "../api/authApi.js";
 import { useAuth } from "../contexts/AuthContext.jsx";
-import { Alert, Card, Form, Button } from "react-bootstrap";
+import { Alert, Card, Form, Button, Container } from "react-bootstrap";
 import RoleSelect from "../components/Forms/RoleSelect.jsx";
 import UserFields from "../components/Forms/UserFields.jsx";
 import DoctorFields from "../components/Forms/DoctorFields.jsx";
+import { FiUserPlus } from "react-icons/fi";
 
 const RegisterPage = () => {
   const { login } = useAuth();
@@ -43,19 +44,20 @@ const RegisterPage = () => {
   };
 
   return (
-    <>
+    <Container className="mt-3 text-center">
+      <h3 className="page-title"><FiUserPlus /> Register</h3>
       {error && (
-        <Alert variant="danger" className="mx-auto" style={{ maxWidth: 420 }}>
+        <Alert variant="danger" className="mx-auto" style={{ maxWidth: 720 }}>
           {error}
         </Alert>
       )}
-      <Card className="mx-auto" style={{ maxWidth: 420 }}>
+      <Card className="mx-auto center-card card-enhanced" style={{ maxWidth: 720 }}>
         <Card.Body>
-          <Card.Title className="mb-3">Register</Card.Title>
+          <Card.Title className="mb-3">Create Account</Card.Title>
           <Form onSubmit={handleSubmit} encType={role === "doctor" ? "multipart/form-data" : undefined}>
             <RoleSelect value={role} onChange={handleRoleChange} />
             {role === "user" ? <UserFields /> : <DoctorFields />}
-            <Button type="submit" disabled={loading} className="w-100 mt-2">
+            <Button type="submit" disabled={loading} className="w-100 mt-2 btn-icon">
               {loading ? "Please wait..." : "Submit"}
             </Button>
           </Form>
@@ -64,7 +66,7 @@ const RegisterPage = () => {
       <p className="text-center mt-3">
         Already registered? <Link to="/login">Login</Link>
       </p>
-    </>
+    </Container>
   );
 };
 

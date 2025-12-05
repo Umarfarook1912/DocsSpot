@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Container, Card, Form, Button, Alert } from "react-bootstrap";
+import { Container, Card, Form, Button, Alert, InputGroup } from "react-bootstrap";
+import { FiCalendar, FiClock } from "react-icons/fi";
 import { createAppointmentApi } from "../api/appointmentApi.js";
 
 const BookAppointmentPage = () => {
@@ -30,21 +31,27 @@ const BookAppointmentPage = () => {
 
   return (
     <Container>
-      <Card className="mx-auto" style={{ maxWidth: 420 }}>
+      <Card className="mx-auto center-card card-enhanced" style={{ maxWidth: 540 }}>
         <Card.Body>
           <Card.Title>Book Appointment</Card.Title>
           {error && <Alert variant="danger">{error}</Alert>}
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3" controlId="date">
               <Form.Label>Date</Form.Label>
-              <Form.Control type="date" name="date" required />
+              <InputGroup>
+                <InputGroup.Text><FiCalendar /></InputGroup.Text>
+                <Form.Control type="date" name="date" required />
+              </InputGroup>
             </Form.Group>
             <Form.Group className="mb-3" controlId="time">
               <Form.Label>Time</Form.Label>
-              <Form.Control type="time" name="time" required />
+              <InputGroup>
+                <InputGroup.Text><FiClock /></InputGroup.Text>
+                <Form.Control type="time" name="time" required />
+              </InputGroup>
             </Form.Group>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Booking..." : "Book"}
+            <Button type="submit" disabled={loading} className="btn-icon">
+              {loading ? "Booking..." : "Book Appointment"}
             </Button>
           </Form>
         </Card.Body>

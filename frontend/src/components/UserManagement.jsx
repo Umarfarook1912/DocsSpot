@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button, Modal, Form, Alert } from "react-bootstrap";
+import { FiPlus, FiEdit, FiTrash2 } from "react-icons/fi";
 
 const roles = ["admin", "user", "doctor"];
 
@@ -48,8 +49,8 @@ const UserManagement = () => {
     return (
         <div>
             <div className="d-flex justify-content-between align-items-center mb-3">
-                <h4>User Management</h4>
-                <Button onClick={handleShow}>Create New User</Button>
+                <h4><FiEdit className="me-2" /> User Management</h4>
+                <Button onClick={handleShow}><FiPlus className="me-1" /> Create New User</Button>
             </div>
             {success && <Alert variant="success">{success}</Alert>}
             <Table bordered hover>
@@ -58,6 +59,7 @@ const UserManagement = () => {
                         <th>Name</th>
                         <th>Email</th>
                         <th>Role</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -66,6 +68,14 @@ const UserManagement = () => {
                             <td>{user.name}</td>
                             <td>{user.email}</td>
                             <td>{user.role}</td>
+                            <td>
+                                <Button size="sm" variant="outline-primary" className="me-2">
+                                    <FiEdit />
+                                </Button>
+                                <Button size="sm" variant="outline-danger">
+                                    <FiTrash2 />
+                                </Button>
+                            </td>
                         </tr>
                     ))}
                 </tbody>

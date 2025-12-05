@@ -3,7 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import AuthForm from "../components/Forms/AuthForm.jsx";
 import { loginApi } from "../api/authApi.js";
 import { useAuth } from "../contexts/AuthContext.jsx";
-import { Alert } from "react-bootstrap";
+import { Alert, Container } from "react-bootstrap";
+import { FiLogIn } from "react-icons/fi";
 
 const LoginPage = () => {
   const { login } = useAuth();
@@ -26,7 +27,8 @@ const LoginPage = () => {
   };
 
   return (
-    <>
+    <Container className="mt-3 text-center">
+      <h3 className="page-title"><FiLogIn /> Login</h3>
       {error && (
         <Alert variant="danger" className="mx-auto" style={{ maxWidth: 420 }}>
           {error}
@@ -44,7 +46,7 @@ const LoginPage = () => {
       <p className="text-center mt-3">
         No account? <Link to="/register">Register</Link>
       </p>
-    </>
+    </Container>
   );
 };
 

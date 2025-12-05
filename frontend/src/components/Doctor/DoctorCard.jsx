@@ -1,5 +1,7 @@
 import { Card, Button, Row, Col, Image } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { FiBriefcase, FiCalendar, FiUser } from "react-icons/fi";
+import { FaRupeeSign } from "react-icons/fa";
 
 const getStaticBase = () => {
   const api = import.meta.env.VITE_API_BASE_URL || "";
@@ -45,12 +47,14 @@ const DoctorCard = ({ doctor }) => {
           </Col>
           <Col>
             <Card.Title>{user?.name}</Card.Title>
-            <Card.Subtitle className="mb-2 text-muted">{user?.designation || doctor?.specialization}</Card.Subtitle>
+            <Card.Subtitle className="mb-2 text-muted">
+              <FiBriefcase className="me-1" /> {user?.designation || doctor?.specialization}
+            </Card.Subtitle>
             <Card.Text>
-              {user?.about && <span>{user.about}<br /></span>}
-              <b>Fee:</b> ₹{doctor?.fee}
+              {user?.about && <span><FiUser className="me-1" />{user.about}<br /></span>}
+              <b><FaRupeeSign className="me-1" />Fee:</b> ₹{doctor?.fee}
             </Card.Text>
-            <Button onClick={handleBook}>Book Appointment</Button>
+            <Button onClick={handleBook}><FiCalendar className="me-1" /> Book Appointment</Button>
           </Col>
         </Row>
       </Card.Body>

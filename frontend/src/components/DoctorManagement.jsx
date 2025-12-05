@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button, Alert, Spinner, Badge } from "react-bootstrap";
+import { FiCheckCircle, FiXCircle, FiUserCheck } from "react-icons/fi";
 import { fetchDoctorsAdminApi, approveDoctorApi, rejectDoctorApi } from "../api/doctorApi.js";
 
 const DoctorManagement = () => {
@@ -86,10 +87,10 @@ const DoctorManagement = () => {
                                     {!doc.isApproved ? (
                                         <>
                                             <Button size="sm" variant="success" className="me-2" onClick={() => handleApprove(doc._id)} disabled={actionLoading === doc._id}>
-                                                {actionLoading === doc._id ? "Processing..." : "Approve"}
+                                                {actionLoading === doc._id ? "Processing..." : <><FiCheckCircle className="me-1" /> Approve</>}
                                             </Button>
                                             <Button size="sm" variant="danger" onClick={() => handleReject(doc._id)} disabled={actionLoading === doc._id}>
-                                                {actionLoading === doc._id ? "Processing..." : "Reject"}
+                                                {actionLoading === doc._id ? "Processing..." : <><FiXCircle className="me-1" /> Reject</>}
                                             </Button>
                                         </>
                                     ) : (
