@@ -14,7 +14,7 @@ const AppNavbar = () => {
   };
 
   return (
-    <Navbar bg="light" expand="lg" className="mb-4">
+    <Navbar bg="transparent" expand="lg" className="mb-4 app-navbar">
       <Container>
         <Navbar.Brand as={Link} to="/">
           <FaStethoscope className="me-2" /> Book a Doctor
